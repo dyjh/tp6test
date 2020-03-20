@@ -21,14 +21,21 @@
 </head>
 
 <body class="gray-bg">
-<div class="wrapper wrapper-content animated fadeInRight" id="app">
+<div class="wrapper wrapper-content animated fadeInRight">
     <div class="row">
         <div class="col-sm-12">
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal2">
                 添加学生
             </button>
-            <div class="ibox float-e-margins">
-                <div class="ibox-title">
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal3">
+                添加课程
+            </button>
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+                添加分数
+            </button>
+
+            <div class="ibox float-e-margins" id="app">
+                <div class="ibox-title"  >
                     <h5>斑马纹效果</h5>
                     <div class="ibox-tools">
                         <a class="collapse-link">
@@ -53,20 +60,18 @@
                     <table class="table table-striped">
                         <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>姓名</th>
-                            <th>性别</th>
-                            <th>生日</th>
-                            <th>班级号</th>
+                            <th>学生姓名</th>
+                            <th>课程</th>
+                            <th>平均分</th>
+                            <th>操作</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr v-for="item in list">
-                            <td>{{ item.sno }}</td>
                             <td>{{ item.sname }}</td>
-                            <td>{{ item.ssex == 0 ? '男' : '女' }}</td>
-                            <td>{{ item.sbrithday }}</td>
-                            <td>{{ item.class }}</td>
+                            <td>{{ item.cname }}</td>
+                            <td>{{ item.degree_avg }}</td>
+                            <td><a v-on:click="getList(item.sname, item.cname)" data-toggle="modal" data-target="#myModal1">查看</a></td>
                         </tr>
                         </tbody>
                     </table>
@@ -75,6 +80,87 @@
         </div>
     </div>
     <div class="modal inmodal fade" id="myModal" tabindex="-1" role="dialog"  aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title">添加学生</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>学员姓名</label>
+                        <select class="form-control m-b" id="student_type">
+
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>课程名</label>
+<!--                        <input type="text" name="cname" placeholder="" value="语文" class="form-control">-->
+                        <select class="form-control m-b" id="class_type">
+
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>分数</label>
+                        <input type="number" name="degree" placeholder="" min="0" max="100" step="0.1" value="0" class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <select class="form-control m-b" name="degree_type">
+                            <option value="1">期初</option>
+                            <option value="2">期中</option>
+                            <option value="3">期末</option>
+                        </select>
+
+                    </div>
+                    <div>
+                        <button class="btn btn-sm btn-primary pull-right m-t-n-xs sb" type="submit"><strong>提交</strong>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal inmodal fade" id="myModal1" tabindex="-1" role="dialog"  aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title">添加学生</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-content">
+
+                            <table class="table table-striped">
+                                <thead>
+                                <tr>
+                                    <th>分数类型</th>
+                                    <th>学员</th>
+                                    <th>课程</th>
+                                    <th>分数</th>
+                                </tr>
+                                </thead>
+                                <tbody id="list">
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal inmodal fade" id="myModal2" tabindex="-1" role="dialog"  aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -111,7 +197,32 @@
 
                     </div>
                     <div>
-                        <button class="btn btn-sm btn-primary pull-right m-t-n-xs sb" type="submit"><strong>提交</strong>
+                        <button class="btn btn-sm btn-primary pull-right m-t-n-xs sb_student" type="submit"><strong>提交</strong>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal inmodal fade" id="myModal3" tabindex="-1" role="dialog"  aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title">添加课程</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>课程名</label>
+                        <input type="text" name="cname" placeholder="111" value="111" class="form-control">
+                    </div>
+
+                    <div>
+                        <button class="btn btn-sm btn-primary pull-right m-t-n-xs sb_class" type="submit"><strong>提交</strong>
                         </button>
                     </div>
                 </div>
@@ -161,25 +272,66 @@
         el:"#app",
         data:{
             list:'',
-            sname:'',
-            class:'',
-            sbrithday:'',
-            ssex:0
+            list_deree:'',
         },
         methods:{
-            getList:function() {
-                $.get("/student/getList",{},function (res) {
+            getInfo:function() {
+                $.get("/degree/getInfo",{},function (res) {
                     res = JSON.parse(res)
                     if (res.code == 200) {
                         app.list = res.data;
-
                     }
                 });
             },
+            getList:function (sname, cname) {
+                getList(sname, cname)
+            }
         }
     });
-    app.getList();
-    $(".sb").click(function () {
+
+    function getList (sname, cname) {
+        $.get("/degree/getList",{sname:sname,cname:cname},function (res) {
+            res = JSON.parse(res)
+            if (res.code == 200) {
+                app.list_deree = res.data;
+                var html = '';
+                for (var item in res.data) {
+                    html += '<tr >\n' +
+                        '                                    <td>'+res.data[item].degree_type+'</td>\n' +
+                        '                                    <td>'+res.data[item].sno +'</td>\n' +
+                        '                                    <td>'+res.data[item].cno+'</td>\n' +
+                        '                                    <td>'+res.data[item].degree+'</td>\n' +
+                        '                                </tr>'
+                }
+                $("#list").html(html);
+            }
+        });
+    }
+    function getClass () {
+        $.get("/className/getList",{},function (res) {
+            res = JSON.parse(res)
+            if (res.code == 200) {
+                var html = '';
+                for (var item in res.data) {
+                    html += '<option value="'+res.data[item].cno+'">'+res.data[item].cname+'</option>'
+                }
+                $("#class_type").html(html);
+            }
+        });
+    }
+    function getStudent () {
+        $.get("/student/getList",{},function (res) {
+            res = JSON.parse(res)
+            if (res.code == 200) {
+                var html = '';
+                for (var item in res.data) {
+                    html += '<option value="'+res.data[item].sno+'">'+res.data[item].sname+'</option>'
+                }
+                $("#student_type").html(html);
+            }
+        });
+    }
+    $(".sb_student").click(function () {
         let ssex = $('input[name="ssex"]').val()
         let sname = $('input[name="sname"]').val()
         let sbrithday = $('input[name="sbrithday"]').val()
@@ -194,6 +346,36 @@
             }
         })
     })
+    $(".sb_class").click(function () {
+        let cname = $('input[name="cname"]').val()
+        $.post("/className/add",{cname:cname},function (res) {
+            res = JSON.parse(res)
+            if (res.code == 200) {
+                alert('添加成功');
+                window.location.reload();
+            } else {
+                alert('添加失败');
+            }
+        })
+    })
+    $(".sb").click(function () {
+        let sno = $('#student_type').val()
+        let cno = $('#class_type').val()
+        let degree = $('input[name="degree"]').val()
+        let degree_type = $('select[name="degree_type"]').val()
+        $.post("/degree/add",{cno:cno,sno:sno,degree:degree,degree_type:degree_type},function (res) {
+            res = JSON.parse(res)
+            if (res.code == 200) {
+                alert('添加成功');
+                window.location.reload();
+            } else {
+                alert(res.msg);
+            }
+        })
+    })
+    app.getInfo();
+    getClass();
+    getStudent();
 </script>
 
 <script type="text/javascript" src="http://tajs.qq.com/stats?sId=9051096" charset="UTF-8"></script>

@@ -19,19 +19,43 @@ class Degree extends BaseController
 
     public function getInfo()
     {
-        $degree1 = DegreeModel::where('degree_type', 1)->avg('degree');
-        $degree2 = DegreeModel::where('degree_type', 2)->avg('degree');
-        $degree3 = DegreeModel::where('degree_type', 3)->avg('degree');
-        return $this->api(['degree1' => $degree1, 'degree2' => $degree2, 'degree3' => $degree3]);
+        $snos = DegreeModel::group('sno')->column('sno');
+        $cnos = DegreeModel::group('cno')->column('cno');
+        $list = [];
+        foreach ($snos as $sno) {
+            foreach ($cnos as $cno) {
+                $degree_avg = DegreeModel::where(['sno' => $sno, 'cno' => $cno])->avg('degree');
+                $stu = StudentModel::where('sno', $sno)->find();
+                if (!$stu) {
+                    continue;
+                }
+                $class = ClassNameModel::where('cno', $cno)->find();
+                if (!$class) {
+                    continue;
+                }
+                $list[] = [
+                    'cname' => $class->cname,
+                    'sname' => $stu->sname,
+                    'degree_avg' => $degree_avg
+                ];
+            }
+        }
+        return $this->api($list);
     }
 
     public function getList(Request $request)
     {
-        $type = $request->param('type');
-        if (!$type) {
-            return $this->api([], 400);
+        $sname = $request->param('sname');
+        $cname = $request->param('cname');
+        $stu = StudentModel::where('sname', $sname)->find();
+        if (!$stu) {
+            return $this->api([], 400, '参数错误');
         }
-        $list = DegreeModel::where('degree_type', $type)->select();
+        $class = ClassNameModel::where('cname', $cname)->find();
+        if (!$class) {
+            return $this->api([], 400, '参数错误');
+        }
+        $list = DegreeModel::where(['sno' => $stu->sno, 'cno' => $class->cno])->select();
         foreach ($list as $val) {
             switch ($val->degree_type) {
                 case 1:
@@ -44,35 +68,24 @@ class Degree extends BaseController
                     $val->degree_type = '期末';
                     break;
             }
-            $stu = StudentModel::where('sno', $val->sno)->find();
-            if ($stu) {
-                $val->sno = $stu->sname;
-            } else {
-                $val->sno = '数据错误';
-            }
-            $class = ClassNameModel::where('cno', $val->cno)->find();
-            if ($class) {
-                $val->cno = $class->cname;
-            } else {
-                $val->cno = '数据错误';
-            }
+            $val->sno = $sname;
+            $val->cno = $cname;
         }
         return $this->api($list);
     }
 
     public function add(Request $request) {
         $data = $request->param();
-        $stu = StudentModel::where('sname', $data['sname'])->find();
-        if (!$stu) {
-            return $this->api([], 400, '学员不存在');
-        }
-        $class = ClassNameModel::where('cname', $data['cname'])->find();
-        if (!$class) {
-            return $this->api([], 400, '课程不存在');
-        }
-        $data['sno'] = $stu->sno;
-        $data['cno'] = $class->cno;
-        dd($data);
+//        $stu = StudentModel::where('sname', $data['sname'])->find();
+//        if (!$stu) {
+//            return $this->api([], 400, '学员不存在');
+//        }
+//        $class = ClassNameModel::where('cname', $data['cname'])->find();
+//        if (!$class) {
+//            return $this->api([], 400, '课程不存在');
+//        }
+       // $data['sno'] = $stu->sno;
+        //$data['cno'] = $class->cno;
         $res = DegreeModel::create($data);
         if ($res) {
             return $this->api([]);
