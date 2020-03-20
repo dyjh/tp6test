@@ -33,6 +33,9 @@ class Degree extends BaseController
                 if (!$class) {
                     continue;
                 }
+                if ($degree_avg == 0) {
+                    continue;
+                }
                 $list[] = [
                     'cname' => $class->cname,
                     'sname' => $stu->sname,
@@ -40,6 +43,8 @@ class Degree extends BaseController
                 ];
             }
         }
+        $last_names = array_column($list,'degree_avg');
+        array_multisort($last_names,SORT_DESC,$list);
         return $this->api($list);
     }
 
@@ -55,7 +60,7 @@ class Degree extends BaseController
         if (!$class) {
             return $this->api([], 400, '参数错误');
         }
-        $list = DegreeModel::where(['sno' => $stu->sno, 'cno' => $class->cno])->select();
+        $list = DegreeModel::where(['sno' => $stu->sno, 'cno' => $class->cno])->order('degree', 'DESC')->select();
         foreach ($list as $val) {
             switch ($val->degree_type) {
                 case 1:
